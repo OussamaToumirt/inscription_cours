@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e0f2f1, #ffffff);
+            margin: 0;
+            padding: 0;
+            color: #263238;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: #ffffff;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0, 105, 92, 0.15);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00796b;
+            font-size: 34px;
+            margin-bottom: 50px;
+            letter-spacing: 1.1px;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: #004d40;
+            border-bottom: 3px solid #80cbc4;
+            padding-bottom: 8px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+        }
+
+        h2::before {
+            content: attr(data-emoji);
+            font-size: 28px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        ul li {
+            margin: 14px 0;
+            padding-left: 10px;
+            border-left: 4px solid #00796b;
+            border-radius: 4px;
+            background: #e0f2f1;
+        }
+
+        .label {
+            font-weight: 700;
+            color: #00796b;
+        }
+
+        button {
+            display: block;
+            margin: 50px auto 0;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 6px 15px rgba(0, 121, 107, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        button:hover {
+            background-color: #004d40;
+            box-shadow: 0 8px 20px rgba(0, 77, 64, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 25px;
+            }
+
+            h1 {
+                font-size: 28px;
+                margin-bottom: 35px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            ul li {
+                font-size: 16px;
+            }
+
+            button {
+                font-size: 18px;
+                padding: 14px 28px;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Étape 3 : Confirmation</h1>
+
+        <h2 data-emoji="📋">Informations personnelles</h2>
+        <ul>
+            <li><span class="label">Nom :</span> {{ etudiant.nom }}</li>
+            <li><span class="label">Email :</span> {{ etudiant.email }}</li>
+            <li><span class="label">Téléphone :</span> {{ etudiant.telephone }}</li>
+            <li><span class="label">Date de naissance :</span> {{ etudiant.date_naissance }}</li>
+        </ul>
+
+        <h2 data-emoji="📚">Cours choisi</h2>
+        <ul>
+            <li><span class="label">Nom :</span> {{ cours.nom }}</li>
+            <li><span class="label">Prix :</span> {{ cours.prix }} €</li>
+            <li><span class="label">Durée :</span> {{ cours.duree }}</li>
+            <li><span class="label">Description :</span> {{ cours.resume }}</li>
+        </ul>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit">✅ Confirmer l'inscription</button>
+        </form>
+    </div>
+</body>
+</html>

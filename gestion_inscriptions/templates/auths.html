@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Pages</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #68D391;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #68D391;
+        }
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6B7280;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+        }
+        .auth-card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .dark .auth-card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error-message {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .error-message.active {
+            max-height: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-200 min-h-screen flex items-center justify-center p-4">
+    <div class="fixed top-4 right-4 flex items-center space-x-2">
+        <span class="text-sm hidden sm:inline">Dark Mode</span>
+        <div class="relative inline-block w-10 mr-2 align-middle select-none">
+            <input type="checkbox" id="theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+            <label for="theme-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+        </div>
+    </div>
+
+    <!-- Auth Container -->
+    <div class="w-full max-w-md mx-auto">
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+            <button id="login-tab" class="flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none border-indigo-500 text-indigo-600 dark:text-indigo-400">
+                Sign In
+            </button>
+            <button id="signup-tab" class="flex-1 py-4 px-1 text-center border-b-2 font-medium text-sm focus:outline-none border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                Create Account
+            </button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="auth-card bg-white dark:bg-gray-800 rounded-lg p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Welcome back</h2>
+                <p class="text-gray-600 dark:text-gray-400">Sign in to your account</p>
+            </div>
+
+            <form id="login" class="space-y-6">
+                {% csrf_token %}
+                <div class="error-message text-red-500 text-sm mb-2" id="login-error"></div>
+                
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email address</label>
+                    <div class="relative">
+                        <input id="login-email" name="email" type="email" autocomplete="email" required class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none transition duration-200">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="error-message text-red-500 text-sm mt-1" id="login-email-error"></div>
+                </div>
+
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                    <div class="relative">
+                        <input id="login-password" name="password" type="password" autocomplete="current-password" required class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none transition duration-200">
+                        <span class="password-toggle" onclick="togglePassword('login-password', this)">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    <div class="error-message text-red-500 text-sm mt-1" id="login-password-error"></div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Remember me</label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Forgot password?</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
+                        <span id="login-btn-text">Sign in</span>
+                        <span id="login-spinner" class="loading-spinner ml-2 hidden"></span>
+                    </button>
+                </div>
+            </form>
+
+           
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="auth-card bg-white dark:bg-gray-800 rounded-lg p-8 hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Create your account</h2>
+                <p class="text-gray-600 dark:text-gray-400">Join us today!</p>
+            </div>
+
+            <form id="signup" class="space-y-6">
+                {% csrf_token %}
+                <div class="error-message text-red-500 text-sm mb-2" id="signup-error"></div>
+                
+                <div>
+                    <label for="signup-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full name</label>
+                    <div class="relative">
+                        <input id="signup-name" name="name" type="text" autocomplete="name" required class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none transition duration-200">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="error-message text-red-500 text-sm mt-1" id="signup-name-error"></div>
+                </div>
+
+                <div>
+                    <label for="signup-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email address</label>
+                    <div class="relative">
+                        <input id="signup-email" name="email" type="email" autocomplete="email" required class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none transition duration-200">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="error-message text-red-500 text-sm mt-1" id="signup-email-error"></div>
+                </div>
+
+                <div>
+                    <label for="signup-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                    <div class="relative">
+                        <input id="signup-password" name="password" type="password" autocomplete="new-password" required class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none transition duration-200">
+                        <span class="password-toggle" onclick="togglePassword('signup-password', this)">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    <div class="error-message text-red-500 text-sm mt-1" id="signup-password-error"></div>
+                    <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <p>Password must contain:</p>
+                        <ul class="list-disc list-inside">
+                            <li id="length" class="text-red-500">At least 8 characters</li>
+                            <li id="uppercase" class="text-red-500">One uppercase letter</li>
+                            <li id="number" class="text-red-500">One number</li>
+                            <li id="special" class="text-red-500">One special character</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                    <div class="relative">
+                        <input id="signup-confirm-password" name="confirm-password" type="password" autocomplete="new-password" required class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none transition duration-200">
+                        <span class="password-toggle" onclick="togglePassword('signup-confirm-password', this)">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    <div class="error-message text-red-500 text-sm mt-1" id="signup-confirm-error"></div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="terms" name="terms" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="terms" class="font-medium text-gray-700 dark:text-gray-300">I agree to the <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Terms</a> and <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Privacy Policy</a></label>
+                    </div>
+                </div>
+                <div class="error-message text-red-500 text-sm" id="signup-terms-error"></div>
+
+                <div>
+                    <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
+                        <span id="signup-btn-text">Create account</span>
+                        <span id="signup-spinner" class="loading-spinner ml-2 hidden"></span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                Already have an account? <button id="switch-to-login" class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Sign in</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved theme preference or use preferred color scheme
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            themeToggle.checked = true;
+        } else {
+            html.classList.remove('dark');
+            themeToggle.checked = false;
+        }
+
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Tab switching
+        const loginTab = document.getElementById('login-tab');
+        const signupTab = document.getElementById('signup-tab');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const switchToLogin = document.getElementById('switch-to-login');
+
+        function showLoginForm() {
+            loginTab.classList.add('border-indigo-500', 'text-indigo-600', 'dark:text-indigo-400');
+            loginTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            signupTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            signupTab.classList.remove('border-indigo-500', 'text-indigo-600', 'dark:text-indigo-400');
+            loginForm.classList.remove('hidden');
+            signupForm.classList.add('hidden');
+        }
+
+        function showSignupForm() {
+            signupTab.classList.add('border-indigo-500', 'text-indigo-600', 'dark:text-indigo-400');
+            signupTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            loginTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+            loginTab.classList.remove('border-indigo-500', 'text-indigo-600', 'dark:text-indigo-400');
+            signupForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        }
+
+        loginTab.addEventListener('click', showLoginForm);
+        signupTab.addEventListener('click', showSignupForm);
+        switchToLogin.addEventListener('click', showLoginForm);
+
+        // Password toggle
+        function togglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+
+        // Password strength checker
+        const passwordInput = document.getElementById('signup-password');
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                const length = document.getElementById('length');
+                const uppercase = document.getElementById('uppercase');
+                const number = document.getElementById('number');
+                const special = document.getElementById('special');
+
+                // Check length
+                if (password.length >= 8) {
+                    length.classList.remove('text-red-500');
+                    length.classList.add('text-green-500');
+                } else {
+                    length.classList.remove('text-green-500');
+                    length.classList.add('text-red-500');
+                }
+
+                // Check uppercase
+                if (/[A-Z]/.test(password)) {
+                    uppercase.classList.remove('text-red-500');
+                    uppercase.classList.add('text-green-500');
+                } else {
+                    uppercase.classList.remove('text-green-500');
+                    uppercase.classList.add('text-red-500');
+                }
+
+                // Check number
+                if (/\d/.test(password)) {
+                    number.classList.remove('text-red-500');
+                    number.classList.add('text-green-500');
+                } else {
+                    number.classList.remove('text-green-500');
+                    number.classList.add('text-red-500');
+                }
+
+                // Check special character
+                if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                    special.classList.remove('text-red-500');
+                    special.classList.add('text-green-500');
+                } else {
+                    special.classList.remove('text-green-500');
+                    special.classList.add('text-red-500');
+                }
+            });
+        }
+
+        // Get CSRF token
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+
+        // Form validation and submission
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.classList.add('active');
+        }
+
+        function hideError(elementId) {
+            const element = document.getElementById(elementId);
+            element.textContent = '';
+            element.classList.remove('active');
+        }
+
+        function hideAllErrors(prefix) {
+            const errorElements = document.querySelectorAll(`[id^="${prefix}-"][id$="-error"]`);
+            errorElements.forEach(element => {
+                element.textContent = '';
+                element.classList.remove('active');
+            });
+            hideError(`${prefix}-error`);
+        }
+
+        // Login form
+        const loginFormEl = document.getElementById('login');
+        if (loginFormEl) {
+            loginFormEl.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+                const rememberMe = document.getElementById('remember-me').checked;
+
+                // Reset errors
+                hideAllErrors('login');
+
+                // Basic validation
+                if (!email || !password) {
+                    showError('login-error', 'Email and password are required');
+                    return;
+                }
+
+                // Show loading state
+                document.getElementById('login-btn-text').textContent = 'Signing in...';
+                document.getElementById('login-spinner').classList.remove('hidden');
+                
+                // Send request to Django backend
+                fetch('/auth/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        remember_me: rememberMe
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loading state
+                    document.getElementById('login-btn-text').textContent = 'Sign in';
+                    document.getElementById('login-spinner').classList.add('hidden');
+                    
+                    if (data.success) {
+                        // Redirect on success
+                        window.location.href = data.redirect_url;
+                    } else {
+                        // Show error
+                        showError('login-error', data.error || 'Login failed');
+                    }
+                })
+                .catch(error => {
+                    // Hide loading state
+                    document.getElementById('login-btn-text').textContent = 'Sign in';
+                    document.getElementById('login-spinner').classList.add('hidden');
+                    
+                    showError('login-error', 'Network error. Please try again.');
+                    console.error('Login error:', error);
+                });
+            });
+        }
+
+        // Signup form
+        const signupFormEl = document.getElementById('signup');
+        if (signupFormEl) {
+            signupFormEl.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('signup-name').value.trim();
+                const email = document.getElementById('signup-email').value.trim();
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm-password').value;
+                const terms = document.getElementById('terms').checked;
+
+                // Reset errors
+                hideAllErrors('signup');
+
+                // Basic validation
+                if (!name || !email || !password || !confirmPassword) {
+                    showError('signup-error', 'All fields are required');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showError('signup-confirm-error', 'Passwords do not match');
+                    return;
+                }
+
+                if (!terms) {
+                    showError('signup-terms-error', 'You must accept the terms and conditions');
+                    return;
+                }
+
+                // Show loading state
+                document.getElementById('signup-btn-text').textContent = 'Creating account...';
+                document.getElementById('signup-spinner').classList.remove('hidden');
+                
+                // Send request to Django backend
+                fetch('/auth/signup/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        password: password,
+                        confirm_password: confirmPassword,
+                        terms: terms
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loading state
+                    document.getElementById('signup-btn-text').textContent = 'Create account';
+                    document.getElementById('signup-spinner').classList.add('hidden');
+                    
+                    if (data.success) {
+                        // Redirect on success
+                        window.location.href = data.redirect_url;
+                    } else {
+                        if (data.errors) {
+                            // Show specific field errors
+                            Object.keys(data.errors).forEach(field => {
+                                if (field === 'confirm_password') {
+                                    showError('signup-confirm-error', data.errors[field]);
+                                } else {
+                                    showError(`signup-${field}-error`, data.errors[field]);
+                                }
+                            });
+                        } else {
+                            showError('signup-error', data.error || 'Signup failed');
+                        }
+                    }
+                })
+                .catch(error => {
+                    // Hide loading state
+                    document.getElementById('signup-btn-text').textContent = 'Create account';
+                    document.getElementById('signup-spinner').classList.add('hidden');
+                    
+                    showError('signup-error', 'Network error. Please try again.');
+                    console.error('Signup error:', error);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

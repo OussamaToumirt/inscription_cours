@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Inscription réussie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #ffffff);
+            color: #333;
+            text-align: center;
+            padding: 60px 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+            padding: 50px 40px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #00796b;
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        p {
+            font-size: 20px;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            font-weight: 700;
+            color: #004d40;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Inscription réussie !</h1>
+        <p>Merci <span class="highlight">{{ etudiant.nom }}</span> pour votre inscription.</p>
+        <p>Vous êtes maintenant inscrit au cours : <span class="highlight">{{ cours.nom }}</span>.</p>
+        <p>Nous avons bien enregistré vos informations.</p>
+    </div>
+</body>
+</html>
