@@ -90,7 +90,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+
+# Morocco timezone setting
+TIME_ZONE = 'Africa/Casablanca'
 
 USE_I18N = True
 

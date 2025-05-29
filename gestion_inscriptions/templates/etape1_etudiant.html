@@ -1,352 +1,183 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8" />
-    <title>Étape 1 - Informations personnelles</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    
-    <!-- Google Fonts - Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
-    <style>
-        :root {
-            --primary: #00796b;
-            --primary-light: #26a69a;
-            --primary-lighter: #80cbc4;
-            --primary-dark: #004d40;
-            --text: #263238;
-            --text-light: #546e7a;
-            --error: #e53935;
-            --success: #43a047;
-            --white: #ffffff;
-            --border-radius: 12px;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--primary-light), var(--primary-lighter));
-            font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: var(--text);
-        }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            max-width: 550px;
-            width: 100%;
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(to right, var(--primary-light), var(--primary-dark));
-        }
-        
-        .progress-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            position: relative;
-        }
-        
-        .progress-container::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            height: 3px;
-            width: 100%;
-            background-color: #e0e0e0;
-            z-index: 1;
-        }
-        
-        .progress-container::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            height: 3px;
-            width: 25%;
-            background-color: var(--primary);
-            z-index: 2;
-        }
-        
-        .progress-step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            position: relative;
-            z-index: 3;
-            color: var(--text-light);
-        }
-        
-        .progress-step.active {
-            background-color: var(--primary);
-            color: var(--white);
-        }
-        
-        .progress-label {
-            position: absolute;
-            top: 35px;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-light);
-        }
-        
-        h1 {
-            color: var(--primary-dark);
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.8rem;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        label {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 8px;
-            display: block;
-            font-size: 0.95rem;
-        }
-        
-        .required::after {
-            content: '*';
-            color: var(--error);
-            margin-left: 4px;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            padding-left: 45px;
-            border: 2px solid var(--primary-lighter);
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            color: var(--text);
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary-dark);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 77, 64, 0.2);
-        }
-        
-        .form-control::placeholder {
-            color: #9e9e9e;
-        }
-        
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 42px;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-        
-        .form-text {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-top: 5px;
-            display: block;
-        }
-        
-        .invalid-feedback {
-            color: var(--error);
-            font-size: 0.8rem;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .form-control:invalid:not(:focus):not(:placeholder-shown) {
-            border-color: var(--error);
-        }
-        
-        .form-control:invalid:not(:focus):not(:placeholder-shown) ~ .invalid-feedback {
-            display: block;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0, 121, 107, 0.4);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 12px 30px rgba(0, 77, 64, 0.6);
-            transform: translateY(-2px);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .form-footer {
-            text-align: center;
-            margin-top: 25px;
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-        
-        /* Responsive */
-        @media (max-width: 576px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            h1 {
-                font-size: 1.5rem;
-            }
-            
-            .progress-label {
-                font-size: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container shadow-lg">
-        <div class="progress-container">
-            <div class="progress-step active">
-                <span>1</span>
-                <span class="progress-label">Informations</span>
-            </div>
-            <div class="progress-step">
-                <span>2</span>
-                <span class="progress-label">Cours</span>
-            </div>
-            <div class="progress-step">
-                <span>3</span>
-                <span class="progress-label">Confirmation</span>
-            </div>
-            <div class="progress-step">
-                <span>4</span>
-                <span class="progress-label">Paiement</span>
-            </div>
-        </div>
-        
-        <h1>Informations personnelles</h1>
-        
-        <form method="POST" novalidate>
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="nom" class="required">Nom</label>
-                <i class="fas fa-user input-icon"></i>
-                <input type="text" class="form-control" id="nom" name="nom" placeholder="Entrez votre nom complet" required minlength="3" />
-                <div class="invalid-feedback">Veuillez entrer votre nom (minimum 3 caractères)</div>
-            </div>
+<!-- templates/etape1_etudiant.html -->
+{% extends 'base.html' %}
 
-            <div class="form-group">
-                <label for="email" class="required">Email</label>
-                <i class="fas fa-envelope input-icon"></i>
-                <input type="email" class="form-control" id="email" name="email" placeholder="exemple@email.com" required />
-                <div class="invalid-feedback">Veuillez entrer une adresse email valide</div>
-                <small class="form-text">Nous ne partagerons jamais votre email avec des tiers.</small>
-            </div>
+{% block title %}Student Profile - Course Registration{% endblock %}
 
-            <div class="form-group">
-                <label for="telephone" class="required">Téléphone</label>
-                <i class="fas fa-phone input-icon"></i>
-                <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="06XXXXXXXX" pattern="[0-9]{10}" required />
-                <div class="invalid-feedback">Veuillez entrer un numéro de téléphone valide (10 chiffres)</div>
-            </div>
+{% block extra_css %}
+<style>
+    .progress-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    .progress-container::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 3px;
+        width: 100%;
+        background-color: #e0e0e0;
+        z-index: 1;
+    }
+    
+    .progress-container::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 3px;
+        width: 25%;
+        background-color: var(--primary-color);
+        z-index: 2;
+    }
+    
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        position: relative;
+        z-index: 3;
+        color: #666;
+    }
+    
+    .progress-step.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .progress-label {
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: 500;
+        color: #666;
+    }
+</style>
+{% endblock %}
 
-            <div class="form-group">
-                <label for="date_naissance" class="required">Date de naissance</label>
-                <i class="fas fa-calendar-alt input-icon"></i>
-                <input type="date" class="form-control" id="date_naissance" name="date_naissance" required />
-                <div class="invalid-feedback">Veuillez entrer votre date de naissance</div>
-            </div>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-5">
+                <!-- Progress Steps -->
+                <div class="progress-container">
+                    <div class="progress-step active">
+                        <span>1</span>
+                        <span class="progress-label">Profile</span>
+                    </div>
+                    <div class="progress-step">
+                        <span>2</span>
+                        <span class="progress-label">Course</span>
+                    </div>
+                    <div class="progress-step">
+                        <span>3</span>
+                        <span class="progress-label">Confirmation</span>
+                    </div>
+                    <div class="progress-step">
+                        <span>4</span>
+                        <span class="progress-label">Complete</span>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h2 class="card-title">Complete Your Profile</h2>
+                    <p class="text-muted">Please provide your information to continue with course registration</p>
+                </div>
 
-            <button type="submit" class="btn btn-primary">
-                Suivant
-                <i class="fas fa-arrow-right"></i>
-            </button>
-        </form>
-        
-        <div class="form-footer">
-            Tous les champs marqués d'un * sont obligatoires
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nom.id_for_label }}" class="form-label">
+                                {{ form.nom.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.nom }}
+                            {% if form.nom.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.nom.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                {{ form.email.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telephone.id_for_label }}" class="form-label">
+                                {{ form.telephone.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.telephone }}
+                            {% if form.telephone.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.telephone.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.date_naissance.id_for_label }}" class="form-label">
+                                {{ form.date_naissance.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.date_naissance }}
+                            {% if form.date_naissance.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.date_naissance.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">
+                            {{ form.address.label }}
+                        </label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.address.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Optional - Your address for course materials delivery</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-arrow-right me-2"></i>Continue to Course Selection
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">All fields marked with * are required</small>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Définir la date maximale (aujourd'hui)
-        const dateInput = document.getElementById('date_naissance');
-        const today = new Date();
-        const minDate = new Date();
-        minDate.setFullYear(today.getFullYear() - 80); // Limite d'âge minimum (80 ans)
-        const maxDate = new Date();
-        maxDate.setFullYear(today.getFullYear() - 16); // Limite d'âge maximum (16 ans)
-        
-        dateInput.max = maxDate.toISOString().split('T')[0];
-        dateInput.min = minDate.toISOString().split('T')[0];
-        
-        // Validation personnalisée
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-                
-                // Mettre en évidence le premier champ invalide
-                const invalidInput = form.querySelector(':invalid');
-                if (invalidInput) {
-                    invalidInput.focus();
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+</div>
+{% endblock %}

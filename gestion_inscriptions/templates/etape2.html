@@ -1,154 +1,249 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Choix du cours - Premium Style</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  
-  <!-- Google Fonts - Poppins -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  
-  <style>
-    body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      font-family: 'Poppins', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .container {
-      margin-top: 60px;
-      margin-bottom: 60px;
-    }
-    h2 {
-      color: #fff;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 40px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-    .card {
-      border-radius: 15px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      cursor: pointer;
-      background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
-    }
-    .card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    }
-    .card-body {
-      padding: 30px;
-      text-align: center;
-    }
-    .card-title {
-      font-weight: 600;
-      font-size: 1.6rem;
-      color: #4b3f72;
-      margin-bottom: 15px;
-    }
-    .card-text {
-      color: #6b6b8a;
-      font-size: 1rem;
-      min-height: 60px;
-      margin-bottom: 20px;
-    }
-    .price {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #764ba2;
-      margin-bottom: 10px;
-    }
-    .duration {
-      color: #a299b8;
-      font-style: italic;
-      margin-bottom: 25px;
-    }
-    .form-check-input {
-      transform: scale(1.4);
-      margin-top: 0.3rem;
-      cursor: pointer;
-    }
-    .form-check-label {
-      font-weight: 600;
-      color: #4b3f72;
-      font-size: 1.1rem;
-      user-select: none;
-      cursor: pointer;
-    }
-    button.btn-submit {
-      display: block;
-      margin: 40px auto 0;
-      padding: 12px 45px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      border-radius: 50px;
-      background: #764ba2;
-      color: white;
-      border: none;
-      box-shadow: 0 5px 15px rgba(118,75,162,0.6);
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
-    }
-    button.btn-submit:hover {
-      background: #5a367a;
-      box-shadow: 0 8px 25px rgba(90,54,122,0.8);
-    }
-    /* Responsive tweaks */
-    @media (max-width: 768px) {
-      .card-body {
-        padding: 20px;
-      }
-      .card-title {
-        font-size: 1.3rem;
-      }
-      .price {
-        font-size: 1.1rem;
-      }
-    }
-  </style>
-</head>
-<body>
+<!-- templates/etape2.html -->
+{% extends 'base.html' %}
 
-<div class="container">
-  <h2>Choisissez votre cours préféré</h2>
-  
-  <form method="post" novalidate>
-    {% csrf_token %}
-    <div class="row g-4">
-      {% for cours in cours %}
-      <div class="col-md-6 col-lg-4">
-        <label for="cours{{ cours.id }}" class="card">
-          <div class="card-body">
-            <h5 class="card-title">{{ cours.nom }}</h5>
-            <p class="card-text">{{ cours.resume }}</p>
-            <p class="price">{{ cours.prix }} €</p>
-            <p class="duration">{{ cours.duree }}</p>
-            <input 
-              type="radio" 
-              name="cours_id" 
-              id="cours{{ cours.id }}" 
-              value="{{ cours.id }}" 
-              class="form-check-input" 
-              required
-            >
-            <span class="form-check-label">Sélectionner ce cours</span>
-          </div>
-        </label>
-      </div>
-      {% endfor %}
+{% block title %}Select Course - Course Registration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .progress-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    .progress-container::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 3px;
+        width: 100%;
+        background-color: #e0e0e0;
+        z-index: 1;
+    }
+    
+    .progress-container::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 3px;
+        width: 50%;
+        background-color: var(--primary-color);
+        z-index: 2;
+    }
+    
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        position: relative;
+        z-index: 3;
+        color: #666;
+    }
+    
+    .progress-step.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .progress-step.completed {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .progress-label {
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: 500;
+        color: #666;
+    }
+    
+    .course-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .course-card.selected {
+        border-color: var(--primary-color);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .form-check-input:checked ~ .course-card {
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-body p-5">
+                <!-- Progress Steps -->
+                <div class="progress-container">
+                    <div class="progress-step completed">
+                        <i class="fas fa-check"></i>
+                        <span class="progress-label">Profile</span>
+                    </div>
+                    <div class="progress-step active">
+                        <span>2</span>
+                        <span class="progress-label">Course</span>
+                    </div>
+                    <div class="progress-step">
+                        <span>3</span>
+                        <span class="progress-label">Confirmation</span>
+                    </div>
+                    <div class="progress-step">
+                        <span>4</span>
+                        <span class="progress-label">Complete</span>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h2 class="card-title">Choose Your Course</h2>
+                    <p class="text-muted">Select the course that best fits your learning goals</p>
+                </div>
+
+                <form method="POST" id="courseForm">
+                    {% csrf_token %}
+                    
+                    {% if form.cours.field.queryset %}
+                        <div class="row">
+                            {% for cours in form.cours.field.queryset %}
+                            <div class="col-lg-6 mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input d-none" type="radio" name="cours" id="cours{{ cours.id }}" value="{{ cours.id }}" required>
+                                    <label class="form-check-label w-100" for="cours{{ cours.id }}">
+                                        <div class="card course-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <h5 class="card-title">{{ cours.nom }}</h5>
+                                                    <span class="badge bg-primary">{{ cours.get_category_display }}</span>
+                                                </div>
+                                                
+                                                <p class="card-text text-muted mb-3">{{ cours.resume|truncatewords:25 }}</p>
+                                                
+                                                <div class="row mb-3">
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Price</small>
+                                                        <div class="fw-bold text-primary">€{{ cours.prix }}</div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Duration</small>
+                                                        <div class="fw-bold">{{ cours.duree }}</div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-users me-1"></i>
+                                                        {% if cours.available_slots > 0 %}
+                                                            {{ cours.available_slots }} spots left
+                                                        {% else %}
+                                                            <span class="text-danger">Full</span>
+                                                        {% endif %}
+                                                    </small>
+                                                    <div class="text-warning">
+                                                        <i class="fas fa-star"></i>
+                                                        <i class="fas fa-star"></i>
+                                                        <i class="fas fa-star"></i>
+                                                        <i class="fas fa-star"></i>
+                                                        <i class="fas fa-star-half-alt"></i>
+                                                        <small class="text-muted ms-1">4.8</small>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mt-3 text-center">
+                                                    <div class="btn btn-outline-primary">
+                                                        <i class="fas fa-check-circle me-2"></i>Select This Course
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <a href="{% url 'etape1' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button type="submit" class="btn btn-primary btn-lg" disabled id="continueBtn">
+                                    <i class="fas fa-arrow-right me-2"></i>Continue to Confirmation
+                                </button>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                            <h4>No Courses Available</h4>
+                            <p class="text-muted">There are no available courses at the moment, or you are already enrolled in all available courses.</p>
+                            <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-home me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
     </div>
-
-    <button type="submit" class="btn-submit">Confirmer le choix</button>
-  </form>
 </div>
+{% endblock %}
 
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('input[name="cours"]');
+    const continueBtn = document.getElementById('continueBtn');
+    const courseCards = document.querySelectorAll('.course-card');
+    
+    radioButtons.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            // Remove selected class from all cards
+            courseCards.forEach(card => card.classList.remove('selected'));
+            
+            // Add selected class to chosen card
+            if (this.checked) {
+                const selectedCard = this.nextElementSibling.querySelector('.course-card');
+                selectedCard.classList.add('selected');
+                continueBtn.disabled = false;
+                continueBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i>Continue to Confirmation';
+            }
+        });
+    });
+    
+    // Add click handler to cards
+    courseCards.forEach(function(card) {
+        card.addEventListener('click', function() {
+            const radio = this.closest('label').previousElementSibling;
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change'));
+        });
+    });
+});
+</script>
+{% endblock %}

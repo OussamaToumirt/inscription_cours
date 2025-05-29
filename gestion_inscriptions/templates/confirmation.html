@@ -1,151 +1,202 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Confirmation</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #e0f2f1, #ffffff);
-            margin: 0;
-            padding: 0;
-            color: #263238;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+<!-- templates/confirmation.html -->
+{% extends 'base.html' %}
 
-        .container {
-            max-width: 700px;
-            width: 100%;
-            background: #ffffff;
-            padding: 40px 50px;
-            border-radius: 20px;
-            box-shadow: 0 12px 35px rgba(0, 105, 92, 0.15);
-            box-sizing: border-box;
-        }
+{% block title %}Confirmation - Course Registration{% endblock %}
 
-        h1 {
-            text-align: center;
-            color: #00796b;
-            font-size: 34px;
-            margin-bottom: 50px;
-            letter-spacing: 1.1px;
-            font-weight: 700;
-        }
+{% block extra_css %}
+<style>
+    .progress-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    .progress-container::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 3px;
+        width: 100%;
+        background-color: #e0e0e0;
+        z-index: 1;
+    }
+    
+    .progress-container::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 3px;
+        width: 75%;
+        background-color: var(--primary-color);
+        z-index: 2;
+    }
+    
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        position: relative;
+        z-index: 3;
+        color: #666;
+    }
+    
+    .progress-step.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .progress-step.completed {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .progress-label {
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: 500;
+        color: #666;
+    }
+    
+    .info-card {
+        background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+        border-left: 4px solid var(--primary-color);
+    }
+</style>
+{% endblock %}
 
-        h2 {
-            color: #004d40;
-            border-bottom: 3px solid #80cbc4;
-            padding-bottom: 8px;
-            margin-top: 40px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-        }
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-5">
+                <!-- Progress Steps -->
+                <div class="progress-container">
+                    <div class="progress-step completed">
+                        <i class="fas fa-check"></i>
+                        <span class="progress-label">Profile</span>
+                    </div>
+                    <div class="progress-step completed">
+                        <i class="fas fa-check"></i>
+                        <span class="progress-label">Course</span>
+                    </div>
+                    <div class="progress-step active">
+                        <span>3</span>
+                        <span class="progress-label">Confirmation</span>
+                    </div>
+                    <div class="progress-step">
+                        <span>4</span>
+                        <span class="progress-label">Complete</span>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h2 class="card-title">Confirm Your Registration</h2>
+                    <p class="text-muted">Please review your information before completing the registration</p>
+                </div>
 
-        h2::before {
-            content: attr(data-emoji);
-            font-size: 28px;
-        }
+                <!-- Student Information -->
+                <div class="card info-card mb-4">
+                    <div class="card-header bg-transparent">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user me-2"></i>Student Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <strong>Name:</strong> {{ etudiant.nom }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Email:</strong> {{ etudiant.email }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Phone:</strong> {{ etudiant.telephone }}
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Date of Birth:</strong> {{ etudiant.date_naissance|date:"F d, Y" }}
+                            </div>
+                            {% if etudiant.address %}
+                            <div class="col-12 mt-2">
+                                <strong>Address:</strong> {{ etudiant.address }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
 
-        ul {
-            list-style: none;
-            padding: 0;
-            font-size: 18px;
-            line-height: 1.6;
-        }
+                <!-- Course Information -->
+                <div class="card info-card mb-4">
+                    <div class="card-header bg-transparent">
+                        <h5 class="mb-0">
+                            <i class="fas fa-book me-2"></i>Selected Course
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="fw-bold">{{ cours.nom }}</h6>
+                                <p class="text-muted mb-2">{{ cours.resume|truncatewords:30 }}</p>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <small class="text-muted">Duration:</small>
+                                        <div class="fw-bold">{{ cours.duree }}</div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <small class="text-muted">Category:</small>
+                                        <div class="fw-bold">{{ cours.get_category_display }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <div class="display-6 text-primary fw-bold">€{{ cours.prix }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        ul li {
-            margin: 14px 0;
-            padding-left: 10px;
-            border-left: 4px solid #00796b;
-            border-radius: 4px;
-            background: #e0f2f1;
-        }
+                <!-- Terms and Conditions -->
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>Terms and Conditions</h6>
+                    <ul class="mb-0">
+                        <li>Registration fee is non-refundable after 7 days</li>
+                        <li>Course materials will be provided upon enrollment</li>
+                        <li>Minimum attendance of 80% is required for certificate</li>
+                        <li>Course schedule may be subject to change with prior notice</li>
+                    </ul>
+                </div>
 
-        .label {
-            font-weight: 700;
-            color: #00796b;
-        }
-
-        button {
-            display: block;
-            margin: 50px auto 0;
-            background-color: #00796b;
-            color: white;
-            border: none;
-            padding: 16px 36px;
-            font-size: 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 6px 15px rgba(0, 121, 107, 0.3);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            width: 100%;
-            max-width: 320px;
-        }
-
-        button:hover {
-            background-color: #004d40;
-            box-shadow: 0 8px 20px rgba(0, 77, 64, 0.5);
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px 25px;
-            }
-
-            h1 {
-                font-size: 28px;
-                margin-bottom: 35px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-
-            ul li {
-                font-size: 16px;
-            }
-
-            button {
-                font-size: 18px;
-                padding: 14px 28px;
-                max-width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Étape 3 : Confirmation</h1>
-
-        <h2 data-emoji="📋">Informations personnelles</h2>
-        <ul>
-            <li><span class="label">Nom :</span> {{ etudiant.nom }}</li>
-            <li><span class="label">Email :</span> {{ etudiant.email }}</li>
-            <li><span class="label">Téléphone :</span> {{ etudiant.telephone }}</li>
-            <li><span class="label">Date de naissance :</span> {{ etudiant.date_naissance }}</li>
-        </ul>
-
-        <h2 data-emoji="📚">Cours choisi</h2>
-        <ul>
-            <li><span class="label">Nom :</span> {{ cours.nom }}</li>
-            <li><span class="label">Prix :</span> {{ cours.prix }} €</li>
-            <li><span class="label">Durée :</span> {{ cours.duree }}</li>
-            <li><span class="label">Description :</span> {{ cours.resume }}</li>
-        </ul>
-
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit">✅ Confirmer l'inscription</button>
-        </form>
+                <!-- Action Buttons -->
+                <form method="POST" class="mt-4">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{% url 'etape2' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Course Selection
+                            </a>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Confirm Registration
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -1,0 +1,191 @@
+<!-- templates/my_registrations.html -->
+{% extends 'base.html' %}
+
+{% block title %}My Registrations - Course Registration{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-0">My Registrations</h1>
+                <p class="text-muted">Track all your course enrollments</p>
+            </div>
+            <a href="{% url 'courses_list' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Enroll in New Course
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if not student %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Please complete your profile first to view your registrations.
+            <a href="{% url 'etape1' %}" class="alert-link">Complete Profile</a>
+        </div>
+    </div>
+</div>
+{% elif not inscriptions %}
+<div class="row">
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-clipboard-list fa-4x text-muted mb-4"></i>
+            <h3 class="text-muted mb-3">No Registrations Yet</h3>
+            <p class="text-muted mb-4">You haven't enrolled in any courses yet. Start your learning journey today!</p>
+            <a href="{% url 'courses_list' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Browse Courses
+            </a>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Registration Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-book-open fa-2x text-primary mb-2"></i>
+                <h5 class="card-title">{{ inscriptions|length }}</h5>
+                <p class="card-text text-muted">Total Courses</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <h5 class="card-title">
+                    {% for inscription in inscriptions %}
+                        {% if inscription.status == 'confirmed' %}{{ forloop.counter }}{% endif %}
+                    {% empty %}0{% endfor %}
+                </h5>
+                <p class="card-text text-muted">Confirmed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <h5 class="card-title">
+                    {% for inscription in inscriptions %}
+                        {% if inscription.status == 'pending' %}{{ forloop.counter }}{% endif %}
+                    {% empty %}0{% endfor %}
+                </h5>
+                <p class="card-text text-muted">Pending</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-euro-sign fa-2x text-info mb-2"></i>
+                <h5 class="card-title">
+                    €{% for inscription in inscriptions %}{{ inscription.cours.prix|add:0 }}{% if not forloop.last %}+{% endif %}{% endfor %}
+                </h5>
+                <p class="card-text text-muted">Total Invested</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Registrations List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Course Registrations</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Course</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Registration Date</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                                <th>Payment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscription in inscriptions %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <h6 class="mb-1">{{ inscription.cours.nom }}</h6>
+                                        <small class="text-muted">{{ inscription.cours.resume|truncatewords:10 }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ inscription.cours.get_category_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if inscription.status == 'confirmed' %}success{% elif inscription.status == 'pending' %}warning{% elif inscription.status == 'cancelled' %}danger{% else %}info{% endif %}">
+                                        {{ inscription.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ inscription.inscription_date|date:"M d, Y" }}</small>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-primary">€{{ inscription.cours.prix }}</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ inscription.cours.duree }}</small>
+                                </td>
+                                <td>
+                                    {% if inscription.payment_status %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Paid
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock me-1"></i>Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Cards -->
+<div class="row mt-4">
+    <div class="col-md-6 mb-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <i class="fas fa-plus-circle fa-2x text-primary mb-3"></i>
+                <h5>Enroll in More Courses</h5>
+                <p class="text-muted">Expand your knowledge with our wide range of courses</p>
+                <a href="{% url 'courses_list' %}" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Browse Courses
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card border-info">
+            <div class="card-body text-center">
+                <i class="fas fa-user-edit fa-2x text-info mb-3"></i>
+                <h5>Update Profile</h5>
+                <p class="text-muted">Keep your information up to date</p>
+                <a href="{% url 'etape1' %}" class="btn btn-info">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
